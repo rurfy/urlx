@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite, fileinfo, zip, gd
+          tools: composer:v2
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      - name: Prepare SQLite
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+          php -r "file_put_contents('.env', preg_replace('/DB_CONNECTION=.*/','DB_CONNECTION=sqlite', file_get_contents('.env')));"
+          php -r "file_put_contents('.env', preg_replace('/DB_DATABASE=.*/','DB_DATABASE=database/database.sqlite', file_get_contents('.env')));"
+
+      - run: php artisan migrate --no-interaction -q
+
+      - run: php artisan test --colors=always
