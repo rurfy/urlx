@@ -1,4 +1,4 @@
-![CI](https://github.com/DEIN-BENUTZERNAME/urlx/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/rurfy/urlx/actions/workflows/ci.yml/badge.svg)
 
 # URLX – Minimaler URL-Shortener (Laravel)
 
