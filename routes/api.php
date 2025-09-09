@@ -15,3 +15,5 @@ Route::get('/links/{slug}/stats', [LinkController::class, 'stats']);
 
 // Debug route
 Route::get('/ping', fn () => 'pong');
+
+Route::delete('/links/{slug}', [LinkController::class, 'destroy']);

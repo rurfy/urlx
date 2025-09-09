@@ -55,4 +55,15 @@ class LinkController extends Controller
         ]);
     }
 
+    public function destroy(string $slug): JsonResponse
+    {
+        $link = Link::where('slug', $slug)->firstOrFail();
+
+        // Durch das FK in der Migration (cascadeOnDelete) werden click_events automatisch gelöscht.
+        $link->delete();
+
+        // 204 = No Content (sauber für DELETE)
+        return response()->json(null, 204);
+    }
+
 }

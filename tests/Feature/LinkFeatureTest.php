@@ -17,13 +17,13 @@ class LinkFeatureTest extends TestCase
         ]);
 
         $resp->assertCreated()
-             ->assertJsonStructure(['slug','short_url','target_url']);
+            ->assertJsonStructure(['slug', 'short_url', 'target_url']);
     }
 
     public function test_it_redirects_and_tracks(): void
     {
         $link = Link::create([
-            'slug'       => 'abc12345',
+            'slug' => 'abc12345',
             'target_url' => 'https://example.com',
         ]);
 
@@ -31,7 +31,7 @@ class LinkFeatureTest extends TestCase
         $resp->assertRedirect('https://example.com');
 
         $this->assertDatabaseHas('links', [
-            'id'     => $link->id,
+            'id' => $link->id,
             'clicks' => 1,
         ]);
 
@@ -42,15 +42,37 @@ class LinkFeatureTest extends TestCase
 
     public function test_index_and_stats(): void
     {
-        $l = Link::create(['slug'=>'stat01','target_url'=>'https://example.org']);
+        $l = Link::create(['slug' => 'stat01', 'target_url' => 'https://example.org']);
         $this->get('/stat01'); // erzeugt 1 Click-Event
 
         $this->getJson('/api/links')
-             ->assertOk()
-             ->assertJsonStructure(['data']);
+            ->assertOk()
+            ->assertJsonStructure(['data']);
 
         $this->getJson('/api/links/stat01/stats')
-             ->assertOk()
-             ->assertJsonStructure(['slug','total_clicks','by_day']);
+            ->assertOk()
+            ->assertJsonStructure(['slug', 'total_clicks', 'by_day']);
     }
+
+    public function test_it_deletes_a_link(): void
+    {
+        $link = Link::create([
+            'slug' => 'todelete1',
+            'target_url' => 'https://example.com',
+        ]);
+
+        // Einen Klick erzeugen, damit es auch Events gäbe
+        $this->get('/todelete1')->assertRedirect('https://example.com');
+
+        // Delete aufrufen
+        $this->deleteJson('/api/links/todelete1')
+            ->assertNoContent(); // 204
+
+        // Link weg
+        $this->assertDatabaseMissing('links', ['id' => $link->id]);
+
+        // Event(s) weg (Cascade)
+        $this->assertDatabaseMissing('click_events', ['link_id' => $link->id]);
+    }
+
 }
