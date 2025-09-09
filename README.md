@@ -1,3 +1,5 @@
+![CI](https://github.com/DEIN-BENUTZERNAME/urlx/actions/workflows/ci.yml/badge.svg)
+
 # URLX – Minimaler URL-Shortener (Laravel)
 
 Kleines Showcase-Projekt mit **Laravel 12**, **OOP**, **Validation**, **DB-Migrationen**, **Weiterleitung & Tracking** und **QR-Code**.  
